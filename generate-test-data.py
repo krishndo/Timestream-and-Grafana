@@ -2,6 +2,8 @@ import boto3
 import json
 from datetime import datetime, timedelta
 import math
+import time
+import random
 
 # constants
 TOPIC = 'timestream_test'
@@ -29,7 +31,8 @@ def GenerateData(currentSamplePoint, deviceID):
     # offset one set of data by 90 degrees, so the data plots don't completely obscure each other
     if deviceID == 1:
         rads += math.pi / 2
-    offset = AMPLITUDE * math.sin(rads)
+    offset = AMPLITUDE * math.sin(rads) + random.randrange(1, 5) # add some randomness as well
+    offset += 0.001 # to ensure double type
     data['temperature'] = TEMP_MEDIAN + offset
     data['humidity'] = HUMIDITY_MEDIAN + offset
     data['pressure'] = PRESSURE_MEDIAN + offset
@@ -91,3 +94,5 @@ while messageTime < currentTime:
     # need a modulo counter that goes from [0,number of samples per day)
     currentSamplePoint += 1
     currentSamplePoint %= SAMPLES_PER_DAY
+    # pause before sending next sample
+    time.sleep(1)
